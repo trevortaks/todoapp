@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Home - Best ToDo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--<link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    <script src="main.js"></script>-->
+    {% include '_scripts.html' %}
+</head>
+<body>
+    <header>
+        
+    </header>
+    <!-- <form action="{{url_for('additem')}}" method="POST" name='form'>
+        {{form.hidden_tag()}}
+        <p>{{form.name(size=32)}}</p>
+        <p>{{form.finishdate()}}</p>
+        <p>{{form.submit}}</p>
+    </form> -->
+    <div style="width: 20em;
+                margin-top: 5em;
+                margin-left: 5em;
+                margin-right: 25%">
+        {% import 'bootstrap/wtf.html' as wtf %}
+        {{ wtf.quick_form(form, action="/add") }}
+    </div>
+</body>
+</html>
