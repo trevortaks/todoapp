@@ -26,7 +26,7 @@ def additem():
 
 @app.route('/delete/<id>')
 def deleteitem(id):
-    task = Task.query.filter_by(id = id)
+    task = Task.query.filter_by(id = id).first_or_404()
     db.session.delete(task)
     db.session.commit()
     return redirect(url_for('index'))
