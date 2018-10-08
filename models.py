@@ -9,6 +9,7 @@ class Task(db.Model):
     image = db.Column(db.String(256))
     timestamp = db.Column(db.DateTime, index = True, default = datetime.utcnow)
     finishdate = db.Column(db.DateTime, index = True)
+    completed = db.Column(db.Boolean, default=False, nullable=False)
     subtasks = db.relationship('subTask', backref='task',cascade = 'all, delete-orphan', lazy = 'dynamic')
 
 class subTask(db.Model):

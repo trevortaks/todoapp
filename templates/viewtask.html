@@ -8,9 +8,17 @@
     {%include '_scripts.html'%}
 </head>
 <body>
+    {% if task.image %}
+        <img src="{{url_for('static',filename='photos/' +task.image )}}">
+    {% endif %}
     <h3>{{task.name}}</h3>
     <h5>Added on: {{moment(task.timestamp).fromNow()}}</h5>
     <h5>Finish by: {{moment(task.finishdate).format('LLL')}}</h5>
+    {% if task.completed == True %}
+        <p>Task has been completed</p>
+    {% else %}
+        <p><a href="{{url_for('completeTask', id=task.id)}}">Mark as Completed {{task.completed}}</a></p>
+    {% endif %}
 
     {% import 'bootstrap/wtf.html' as wtf %}
     {{ wtf.quick_form(form, action="/task/{}".format(task.id)) }}
@@ -23,12 +31,23 @@
         {%endfor%}
     </div>
     <style>
+        img{
+            width: 20em;
+        }
         .form-control{
             width: inherit;
             margin: 0 auto 5px;
+            font-size: 2em;
         }
         body{
             text-align: center;
+        }
+        .subtasks{
+            margin-top: 10px;
+            font-size: 3em;
+        }
+        h3{
+            font-size: 5em;
         }
     </style>
 </body>

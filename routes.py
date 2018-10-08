@@ -1,8 +1,10 @@
 from flask import render_template, redirect, url_for
+from werkzeug.utils import secure_filename
 from datetime import datetime
 from models import Task, subTask
 from forms import newTask, Activity
 from app import app, db
+import os
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -14,8 +16,12 @@ def index():
 def additem():
     form = newTask()
     if form.validate_on_submit():
+        file = form.image.data
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(os.path.abspath("static/"), 'photos', filename))
         task = Task(name=form.name.data, 
-                    finishdate = form.finishdate.data
+                    finishdate = form.finishdate.data,
+                    image = filename
                     )
         db.session.add(task)
         db.session.commit()
@@ -48,3 +54,11 @@ def viewtask(id):
     task = Task.query.filter_by(id=id).first_or_404()
     subtask = task.subtasks
     return render_template('viewtask.html', task=task, subtask=subtask, form=form)
+
+@app.route('/completed/<id>')
+def completeTask(id):
+    task = Task.query.filter_by(id=id)
+    task.completed = True
+    db.session.commit()
+    return redirect(url_for('viewtask', id=id))
+
