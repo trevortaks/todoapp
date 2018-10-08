@@ -13,6 +13,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'app.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'eygfyiTYTdseGD5EE578OD098A7534RFDD' #For development purposes only
+
 db = SQLAlchemy(app)
 
 import routes

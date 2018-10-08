@@ -15,8 +15,21 @@
     {% import 'bootstrap/wtf.html' as wtf %}
     {{ wtf.quick_form(form, action="/task/{}".format(task.id)) }}
 
-    {%for subtask in subtask%}
-        <p>{{subtask.name}}</p>
-    {%endfor%}
+    <div class= "subtasks">
+        {%for subtask in subtask%}
+            <div class="activity">
+                <p>{{loop.index}} : {{subtask.name}}</p>
+            </div>
+        {%endfor%}
+    </div>
+    <style>
+        .form-control{
+            width: inherit;
+            margin: 0 auto 5px;
+        }
+        body{
+            text-align: center;
+        }
+    </style>
 </body>
 </html>

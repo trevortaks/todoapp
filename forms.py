@@ -12,5 +12,5 @@ class newTask(FlaskForm):
     submit = SubmitField('Submit')
 
 class Activity(FlaskForm):
-    activity = StringField('Activity', render_kw={"placeholder":"Activity"})
+    activity = StringField('Activity', render_kw={"placeholder":" Add Task Activity"})
     submit = SubmitField('Submit')
