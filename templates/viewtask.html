@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Page Title</title>
+    <title>{{task.name}} | My ToDo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     {%include '_scripts.html'%}
 </head>
@@ -13,15 +13,16 @@
     {% endif %}
     <h3>{{task.name}}</h3>
     <h5>Added on: {{moment(task.timestamp).fromNow()}}</h5>
-    <h5>Finish by: {{moment(task.finishdate).format('LLL')}}</h5>
     {% if task.completed == True %}
         <p>Task has been completed</p>
+        <h5>Finished on: {{moment(task.finishdate).format('LLL')}}</h5>
     {% else %}
-        <p><a href="{{url_for('completeTask', id=task.id)}}">Mark as Completed {{task.completed}}</a></p>
+        <h5>Finish by: {{moment(task.finishdate).format('LLL')}}</h5>
+        <p><a href="{{url_for('completeTask', id=task.id)}}">Mark as Completed</a></p>
+        {% import 'bootstrap/wtf.html' as wtf %}
+        {{ wtf.quick_form(form, action="/task/{}".format(task.id)) }}
     {% endif %}
 
-    {% import 'bootstrap/wtf.html' as wtf %}
-    {{ wtf.quick_form(form, action="/task/{}".format(task.id)) }}
 
     <div class= "subtasks">
         {%for subtask in subtask%}
@@ -31,6 +32,10 @@
         {%endfor%}
     </div>
     <style>
+        body{
+            padding-top: 10px;
+            background-color: #636363;
+        }
         img{
             width: 20em;
         }

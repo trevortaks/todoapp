@@ -17,7 +17,6 @@ app.config['SECRET_KEY'] = 'eygfyiTYTdseGD5EE578OD098A7534RFDD' #For development
 db = SQLAlchemy(app)
 
 import routes
-from models import *
 
 migrate = Migrate(app, db)
 bootstrap = Bootstrap(app)

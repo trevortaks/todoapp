@@ -59,6 +59,9 @@ def viewtask(id):
 def completeTask(id):
     task = Task.query.filter_by(id=id).first_or_404()
     task.completed = True
+    time = datetime.utcnow()
+    print(time)
+    task.finishdate = time
     db.session.commit()
     return redirect(url_for('viewtask', id=id))
 
