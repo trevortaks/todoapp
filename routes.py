@@ -57,7 +57,7 @@ def viewtask(id):
 
 @app.route('/completed/<id>')
 def completeTask(id):
-    task = Task.query.filter_by(id=id)
+    task = Task.query.filter_by(id=id).first_or_404()
     task.completed = True
     db.session.commit()
     return redirect(url_for('viewtask', id=id))
