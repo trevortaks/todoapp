@@ -5,6 +5,7 @@ from models import Task, subTask
 from forms import newTask, Activity
 from app import app, db
 import os
+import uuid
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -17,7 +18,7 @@ def additem():
     form = newTask()
     if form.validate_on_submit():
         file = form.image.data
-        filename = secure_filename(file.filename)
+        filename = uuid.uuid4().hex
         file.save(os.path.join(os.path.abspath("static/"), 'photos', filename))
         task = Task(name=form.name.data, 
                     finishdate = form.finishdate.data,
