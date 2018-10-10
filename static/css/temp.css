@@ -1,0 +1,40 @@
+
+body{
+    background-color: #636363;
+    text-align: center;
+}
+img{
+    width: 20em;
+}
+.form-control{
+    width: inherit;
+    margin: 0 auto 5px;
+    font-size: 2em;
+}
+.subtasks{
+    margin-top: 10px;
+    font-size: 3em;
+}
+h3{
+    font-size: 5em;
+}
+
+.navbar{
+    margin-bottom: 10px;
+    padding: 10px;
+    text-align: center;
+    width: 100%;
+    background-color: blue;
+}
+
+ul .navlist{
+    margin: auto 10px;
+    list-style: none;
+}
+li{
+    display: block;
+    float: left;
+    text-align: center;
+    font: 2em white;
+    margin: 10px 10px;
+}

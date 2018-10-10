@@ -10,6 +10,8 @@
 </head>
 <body>
 
+    {% include '_nav.html' %}
+
     {% import 'bootstrap/wtf.html' as wtf %}
     {{ wtf.quick_form(form, action=("/signup"))}}
     

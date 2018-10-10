@@ -1,0 +1,19 @@
+{% if current_user.is_authenticated%}
+    <nav class="navbar">
+        <ul class="navlist">
+            <li><a href="{{url_for('index')}}">Home</a></li>
+            <li><a href="{{url_for('addTask')}}">Add Task</a></li>
+            <li><a href="#"></a></li>
+            <li><a href="#">{{current_user.fullname}}</a></li>
+            <li><a href="{{url_for('logout')}}">Logout</a></li>
+        </ul>
+    </nav>
+{%else%}
+    <nav class="navbar">
+        <ul class="navlist">
+            <li><a href="#">ToDo</a></li>
+            <li><a href="{{url_for('signup')}}">Sign Up</a></li>
+            <li><a href="">About</a></li>
+        </ul>
+    </nav>
+{%endif%}

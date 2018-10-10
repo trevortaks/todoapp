@@ -57,7 +57,7 @@ def signup():
     return render_template('signup.html', form=form)
 
 @app.route('/add', methods=['GET','POST'])
-def additem():
+def addTask():
     form = newTask()
     if form.validate_on_submit():
         file = form.image.data
