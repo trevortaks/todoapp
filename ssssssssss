@@ -1,0 +1,292 @@
+[1mdiff --git a/app.py b/app.py[m
+[1mindex ccda2f1..0a7c9e0 100644[m
+[1m--- a/app.py[m
+[1m+++ b/app.py[m
+[36m@@ -3,6 +3,7 @@[m [mfrom flask_sqlalchemy import SQLAlchemy[m
+ from flask_migrate import Migrate[m
+ from flask_bootstrap import Bootstrap[m
+ from flask_moment import Moment[m
+[32m+[m[32mfrom flask_login import LoginManager[m
+ import os[m
+ [m
+ basedir = os.path.abspath(os.path.dirname(__file__))[m
+[36m@@ -17,11 +18,22 @@[m [mapp.config['SECRET_KEY'] = 'eygfyiTYTdseGD5EE578OD098A7534RFDD' #For development[m
+ db = SQLAlchemy(app)[m
+ [m
+ import routes[m
+[32m+[m[32mfrom models import User[m
+ [m
+ migrate = Migrate(app, db)[m
+[32m+[m
+[32m+[m[32mlogin = LoginManager(app)[m
+[32m+[m[32mlogin.login_view = 'login'[m
+[32m+[m
+[32m+[m[32m@login.user_loader[m
+[32m+[m[32mdef load_user(user_id):[m
+[32m+[m[32m    return User.query.get(int(user_id))[m
+[32m+[m[32m    #return None[m[41m [m
+[32m+[m
+ bootstrap = Bootstrap(app)[m
+ moment = Moment(app)[m
+ [m
+ [m
+[32m+[m
+ if __name__ == '__main__':[m
+     app.run(debug=True) #Dev environment[m
+[1mdiff --git a/config.py b/config.py[m
+[1mdeleted file mode 100644[m
+[1mindex f4efe9b..0000000[m
+[1m--- a/config.py[m
+[1m+++ /dev/null[m
+[36m@@ -1,7 +0,0 @@[m
+[31m-import os[m
+[31m-[m
+[31m-basedir = os.path.abspath(os.path.dirname(__file__))[m
+[31m-[m
+[31m-class Config:[m
+[31m-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')[m
+[31m-    SQLALCHEMY_TRACK_MODIFICATIONS = False[m
+\ No newline at end of file[m
+[1mdiff --git a/forms.py b/forms.py[m
+[1mindex ebe6d73..4cdd22b 100644[m
+[1m--- a/forms.py[m
+[1m+++ b/forms.py[m
+[36m@@ -1,16 +1,30 @@[m
+ from flask_wtf import FlaskForm[m
+ from wtforms import FileField[m
+[31m-from wtforms import StringField, SubmitField, TextAreaField[m
+[32m+[m[32mfrom wtforms import StringField, SubmitField, TextAreaField, PasswordField[m
+ from wtforms.fields.html5 import DateField[m
+[31m-from wtforms.validators import DataRequired, Length, ValidationError[m
+[32m+[m[32mfrom wtforms.validators import DataRequired, Length, ValidationError, Email, EqualTo[m
+ from models import Task, subTask[m
+ [m
+ class newTask(FlaskForm):[m
+     name = StringField('Task Name', validators=[DataRequired()], render_kw={"placeholder":"Task Name"})[m
+     image = FileField('Task Image',render_kw={"placeholder":"Task Image"})[m
+[31m-    finishdate = DateField('DatePicker')[m
+[32m+[m[32m    finishdate = DateField('DatePicker', validators=[DataRequired()])[m
+     submit = SubmitField('Submit')[m
+ [m
+ class Activity(FlaskForm):[m
+[31m-    activity = StringField('Activity', render_kw={"placeholder":" Add Task Activity"})[m
+[31m-    submit = SubmitField('Submit')[m
+[32m+[m[32m    activity = StringField('Activity', validators=[DataRequired()], render_kw={"placeholder":" Add Task Activity"})[m
+[32m+[m[32m    submit = SubmitField('Add Activity')[m
+[32m+[m
+[32m+[m[32mclass Login(FlaskForm):[m
+[32m+[m[32m    username = StringField('Username', validators=[DataRequired()], render_kw={"placeholder":"Username"})[m
+[32m+[m[32m    password = PasswordField('Password', validators=[DataRequired()], render_kw={"placeholder":"Password"})[m
+[32m+[m[32m    submit = SubmitField('Login')[m[41m [m
+[32m+[m
+[32m+[m[32mclass SignUp(FlaskForm):[m
+[32m+[m[32m    profilepic = FileField('Profile Picture', render_kw={"placeholder":"Profile Pic"})[m
+[32m+[m[32m    username = StringField('Username', validators=[DataRequired()], render_kw={"placeholder":"Username"})[m
+[32m+[m[32m    fullname = StringField('Full Name', validators=[DataRequired()], render_kw={"placeholder":"Full Name"})[m
+[32m+[m[32m    email = StringField('Email', validators=[DataRequired(), Email()], render_kw={"placeholder":"Email"})[m
+[32m+[m[32m    password1 = PasswordField('Password1', validators=[DataRequired()], render_kw={"placeholder":"Password"})[m
+[32m+[m[32m    password2 = PasswordField('Password2', validators=[DataRequired(), EqualTo('password1')], render_kw={"placeholder": "Repeat Password"})[m
+[32m+[m[32m    submit = SubmitField('Sign Up')[m
+\ No newline at end of file[m
+[1mdiff --git a/migrations/__pycache__/env.cpython-36.pyc b/migrations/__pycache__/env.cpython-36.pyc[m
+[1mindex bd65f33..a450e49 100644[m
+Binary files a/migrations/__pycache__/env.cpython-36.pyc and b/migrations/__pycache__/env.cpython-36.pyc differ
+[1mdiff --git a/migrations/versions/__pycache__/f8a4401177eb_.cpython-36.pyc b/migrations/versions/__pycache__/f8a4401177eb_.cpython-36.pyc[m
+[1mindex 934d2ce..eba24fc 100644[m
+Binary files a/migrations/versions/__pycache__/f8a4401177eb_.cpython-36.pyc and b/migrations/versions/__pycache__/f8a4401177eb_.cpython-36.pyc differ
+[1mdiff --git a/models.py b/models.py[m
+[1mindex d818724..ec2c911 100644[m
+[1m--- a/models.py[m
+[1m+++ b/models.py[m
+[36m@@ -1,5 +1,23 @@[m
+[31m-from app import app, db[m
+[32m+[m[32mfrom app import db, app[m
+ from datetime import datetime[m
+[32m+[m[32mfrom werkzeug.security import generate_password_hash, check_password_hash[m
+[32m+[m[32mfrom flask_login import UserMixin, current_user[m
+[32m+[m
+[32m+[m[32mclass User(UserMixin, db.Model):[m
+[32m+[m[32m    __tablename__ = 'User'[m
+[32m+[m[32m    id = db.Column(db.Integer, primary_key=True)[m
+[32m+[m[32m    username = db.Column(db.String(25), unique=True, index=True)[m
+[32m+[m[32m    fullname = db.Column(db.String(256))[m
+[32m+[m[32m    email = db.Column(db.String(256), unique=True, index=True)[m
+[32m+[m[32m    password_hash = db.Column(db.String(128))[m
+[32m+[m[32m    profilepic = db.Column(db.String(256))[m
+[32m+[m[32m    task = db.relationship('Task', backref='user', lazy='dynamic', cascade = 'all, delete-orphan')[m
+[32m+[m
+[32m+[m[32m    def set_password(self, password):[m
+[32m+[m[32m        self.password_hash = generate_password_hash(password)[m
+[32m+[m
+[32m+[m[32m    def check_password(self, password):[m
+[32m+[m[32m        return check_password_hash(self.password_hash, password)[m
+ [m
+ [m
+ class Task(db.Model):[m
+[36m@@ -11,9 +29,11 @@[m [mclass Task(db.Model):[m
+     finishdate = db.Column(db.DateTime, index = True)[m
+     completed = db.Column(db.Boolean, default=False, nullable=False)[m
+     subtasks = db.relationship('subTask', backref='task',cascade = 'all, delete-orphan', lazy = 'dynamic')[m
+[32m+[m[32m    user_id = db.Column(db.Integer, db.ForeignKey('User.id'))[m
+ [m
+ class subTask(db.Model):[m
+     __tablename__ = 'subTask'[m
+     id = db.Column(db.Integer, primary_key = True)[m
+     name = db.Column(db.String(128))[m
+[31m-    task_id = db.Column(db.Integer, db.ForeignKey('Task.id'))[m
+\ No newline at end of file[m
+[32m+[m[32m    task_id = db.Column(db.Integer, db.ForeignKey('Task.id'))[m
+[41m+[m
+[1mdiff --git a/routes.py b/routes.py[m
+[1mindex 004c354..eeb0f02 100644[m
+[1m--- a/routes.py[m
+[1m+++ b/routes.py[m
+[36m@@ -1,18 +1,61 @@[m
+[31m-from flask import render_template, redirect, url_for[m
+[31m-from werkzeug.utils import secure_filename[m
+[31m-from datetime import datetime[m
+[31m-from models import Task, subTask[m
+[31m-from forms import newTask, Activity[m
+[31m-from app import app, db[m
+ import os[m
+ import uuid[m
+[32m+[m[32mfrom datetime import datetime[m
+[32m+[m[32mfrom flask import render_template, redirect, url_for[m
+[32m+[m[32mfrom flask_login import login_required, login_user, logout_user, current_user[m
+[32m+[m[32m#from werkzeug.utils import secure_filename[m
+[32m+[m[32mfrom models import Task, subTask, User[m
+[32m+[m[32mfrom forms import newTask, Activity, Login, SignUp[m
+[32m+[m[32mfrom app import app, db[m
+[32m+[m
+ [m
+ [m
+ @app.route('/', methods=['GET', 'POST'])[m
+[32m+[m[32m@app.route('/index', methods=['GET', 'POST'])[m
+[32m+[m[32m@login_required[m[41m [m
+ def index():[m
+[31m-    tasks=Task.query.order_by(Task.timestamp.desc())[m
+[32m+[m[32m    tasks=Task.query.filter_by(user_id=1).order_by(Task.timestamp.desc())[m
+     return render_template('index.html', tasks=tasks)[m
+ [m
+[32m+[m[32m@app.route('/login', methods=['GET', 'POST'])[m
+[32m+[m[32mdef login():[m
+[32m+[m[32m    if current_user.is_authenticated:[m
+[32m+[m[32m        return redirect(url_for('index'))[m
+[32m+[m[32m    form = Login()[m
+[32m+[m[32m    if form.validate_on_submit():[m
+[32m+[m[32m        user = User.query.filter_by(username = form.username.data).first_or_404()[m
+[32m+[m[32m        if user is None or not user.check_password(form.password.data):[m
+[32m+[m[32m            return redirect(url_for('login'))[m
+[32m+[m[32m        login_user(user)[m
+[32m+[m[32m        return redirect(url_for('index'))[m
+[32m+[m[32m    return render_template('login.html', form=form)[m
+[32m+[m
+[32m+[m[32m@app.route('/logout')[m
+[32m+[m[32mdef logout():[m
+[32m+[m[32m    logout_user()[m
+[32m+[m[32m    return redirect(url_for('login'))[m
+[32m+[m
+[32m+[m[32m@app.route('/signup', methods=['GET', 'POST'])[m
+[32m+[m[32mdef signup():[m
+[32m+[m[32m    if current_user.is_authenticated:[m
+[32m+[m[32m        return redirect(url_for('index'))[m
+[32m+[m[32m    form = SignUp()[m
+[32m+[m[32m    if form.validate_on_submit():[m
+[32m+[m[32m        file = form.profilepic.data[m
+[32m+[m[32m        filename = uuid.uuid4().hex[m
+[32m+[m[32m        file.save(os.path.join(os.path.abspath("static/"),'photos', filename))[m
+[32m+[m[32m        user = User(username = form.username.data,[m
+[32m+[m[32m                    email = form.email.data,[m
+[32m+[m[32m                    fullname = form.fullname.data,[m
+[32m+[m[32m                    profilepic = filename[m
+[32m+[m[32m                    )[m
+[32m+[m[32m        user.set_password(form.password1.data)[m
+[32m+[m[41m        [m
+[32m+[m[32m        db.session.add(user)[m
+[32m+[m[32m        db.session.commit()[m
+[32m+[m[32m        return redirect(url_for('login'))[m
+[32m+[m[32m    return render_template('signup.html', form=form)[m
+[32m+[m
+ @app.route('/add', methods=['GET','POST'])[m
+ def additem():[m
+     form = newTask()[m
+[36m@@ -22,7 +65,8 @@[m [mdef additem():[m
+         file.save(os.path.join(os.path.abspath("static/"), 'photos', filename))[m
+         task = Task(name=form.name.data, [m
+                     finishdate = form.finishdate.data,[m
+[31m-                    image = filename[m
+[32m+[m[32m                    image = filename,[m
+[32m+[m[32m                    user = current_user[m
+                     )[m
+         db.session.add(task)[m
+         db.session.commit()[m
+[36m@@ -32,8 +76,8 @@[m [mdef additem():[m
+ [m
+ [m
+ @app.route('/delete/<id>')[m
+[31m-def deleteitem(id):[m
+[31m-    task = Task.query.filter_by(id = id).first_or_404()[m
+[32m+[m[32mdef deleteitem(task_id):[m
+[32m+[m[32m    task = Task.query.filter_by(task_id=id).first_or_404()[m
+     db.session.delete(task)[m
+     db.session.commit()[m
+     return redirect(url_for('index'))[m
+[36m@@ -60,9 +104,6 @@[m [mdef viewtask(id):[m
+ def completeTask(id):[m
+     task = Task.query.filter_by(id=id).first_or_404()[m
+     task.completed = True[m
+[31m-    time = datetime.utcnow()[m
+[31m-    print(time)[m
+[31m-    task.finishdate = time[m
+     db.session.commit()[m
+     return redirect(url_for('viewtask', id=id))[m
+ [m
+[1mdiff --git a/static/photos/WP_20170218_3042.jpg b/static/photos/WP_20170218_3042.jpg[m
+[1mdeleted file mode 100644[m
+[1mindex 2579c7d..0000000[m
+Binary files a/static/photos/WP_20170218_3042.jpg and /dev/null differ
+[1mdiff --git a/templates/viewtask.html b/templates/viewtask.html[m
+[1mindex 83d462f..e1413d5 100644[m
+[1m--- a/templates/viewtask.html[m
+[1m+++ b/templates/viewtask.html[m
+[36m@@ -3,7 +3,7 @@[m
+ <head>[m
+     <meta charset="utf-8" />[m
+     <meta http-equiv="X-UA-Compatible" content="IE=edge">[m
+[31m-    <title>{{task.name}} | My ToDo</title>[m
+[32m+[m[32m    <title>Page Title</title>[m
+     <meta name="viewport" content="width=device-width, initial-scale=1">[m
+     {%include '_scripts.html'%}[m
+ </head>[m
+[36m@@ -13,16 +13,15 @@[m
+     {% endif %}[m
+     <h3>{{task.name}}</h3>[m
+     <h5>Added on: {{moment(task.timestamp).fromNow()}}</h5>[m
+[32m+[m[32m    <h5>Finish by: {{moment(task.finishdate).format('LLL')}}</h5>[m
+     {% if task.completed == True %}[m
+         <p>Task has been completed</p>[m
+[31m-        <h5>Finished on: {{moment(task.finishdate).format('LLL')}}</h5>[m
+     {% else %}[m
+[31m-        <h5>Finish by: {{moment(task.finishdate).format('LLL')}}</h5>[m
+[31m-        <p><a href="{{url_for('completeTask', id=task.id)}}">Mark as Completed</a></p>[m
+[31m-        {% import 'bootstrap/wtf.html' as wtf %}[m
+[31m-        {{ wtf.quick_form(form, action="/task/{}".format(task.id)) }}[m
+[32m+[m[32m        <p><a href="{{url_for('completeTask', id=task.id)}}">Mark as Completed {{task.completed}}</a></p>[m
+     {% endif %}[m
+ [m
+[32m+[m[32m    {% import 'bootstrap/wtf.html' as wtf %}[m
+[32m+[m[32m    {{ wtf.quick_form(form, action="/task/{}".format(task.id)) }}[m
+ [m
+     <div class= "subtasks">[m
+         {%for subtask in subtask%}[m
+[36m@@ -32,10 +31,6 @@[m
+         {%endfor%}[m
+     </div>[m
+     <style>[m
+[31m-        body{[m
+[31m-            padding-top: 10px;[m
+[31m-            background-color: #636363;[m
+[31m-        }[m
+         img{[m
+             width: 20em;[m
+         }[m
